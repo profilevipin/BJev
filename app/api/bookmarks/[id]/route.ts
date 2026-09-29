@@ -14,7 +14,11 @@ export async function GET(_: Request, context: { params: Promise<{ id: string }>
     related = (sqlite.prepare("SELECT id,text,author,summary,url,embedding_json FROM bookmarks WHERE embedding_json IS NOT NULL AND id!=?").all(id) as Record<string, unknown>[])
       .map((row) => ({ ...row, similarity: cosine(embedding, JSON.parse(String(row.embedding_json || "[]"))) }))
       .sort((a, b) => Number(b.similarity) - Number(a.similarity)).slice(0, 5)
-      .map(({ embedding_json: _, ...row }) => row);
+      .map((row) => {
+        const clean: Record<string, unknown> = { ...row };
+        delete clean.embedding_json;
+        return clean;
+      });
   }
   const collections = sqlite.prepare(`SELECT c.*,cb.bookmark_id IS NOT NULL selected FROM collections c
     LEFT JOIN collection_bookmarks cb ON cb.collection_id=c.id AND cb.bookmark_id=? ORDER BY c.name`).all(id);
