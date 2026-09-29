@@ -12,7 +12,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:38471](http://localhost:38471). SQLite is created automatically at `data/folio.db`; starter categories and four sample bookmarks appear on first run.
+Open [http://localhost:43123](http://localhost:43123). SQLite is created automatically at `data/folio.db`; starter categories and sample bookmarks appear on first run.
 
 Useful checks:
 

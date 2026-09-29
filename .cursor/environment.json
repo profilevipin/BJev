@@ -1,0 +1,16 @@
+{
+  "name": "Folio",
+  "install": "npm install",
+  "terminals": [
+    {
+      "name": "folio-dev",
+      "command": "npm run dev"
+    }
+  ],
+  "ports": [
+    {
+      "name": "Folio",
+      "port": 43123
+    }
+  ]
+}
