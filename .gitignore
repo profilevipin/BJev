@@ -1,0 +1,8 @@
+node_modules/
+.next/
+.env
+.env.local
+data/*.db*
+agent-tools/
+coverage/
+*.tsbuildinfo

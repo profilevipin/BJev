@@ -1,0 +1,18 @@
+{
+  "bookmarks": [
+    {
+      "tweetId": "sample-import-101",
+      "url": "https://x.com/example/status/101",
+      "text": "Build the smallest useful corpus before choosing an embedding model.",
+      "author": "sample_author",
+      "postedAt": "2026-01-15T10:00:00Z"
+    },
+    {
+      "tweetId": "sample-import-102",
+      "url": "https://x.com/example/status/102",
+      "text": "A good reading list has an exit: summarize it, use it, or delete it.",
+      "author": "sample_author",
+      "postedAt": "2026-01-16T10:00:00Z"
+    }
+  ]
+}
