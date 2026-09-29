@@ -19,6 +19,9 @@ export type JevClassification = {
 };
 
 type JsonObject = Record<string, unknown>;
+type DecisionQuestion =
+  | { type: "choice"; instructions: string; criteria: Record<string, string> }
+  | { type: "noul"; instructions: string };
 
 const JEV_MODEL = "typesafe/jev-1.13";
 const OPENROUTER_DECISIONS_URL = "https://openrouter.ai/api/alpha/decisions";
@@ -70,7 +73,7 @@ export async function classifyWithJev(
       type: "noul",
       instructions: "Will this bookmark remain useful over time rather than being time-sensitive?",
     },
-  };
+  } satisfies Record<string, DecisionQuestion>;
   const systemOne = endpoint.endsWith("/systemone");
   const questions = systemOne
     ? Object.entries(decisionQuestions).map(([id, question]) => ({
