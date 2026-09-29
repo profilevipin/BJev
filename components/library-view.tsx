@@ -24,7 +24,7 @@ export function LibraryView({ reviewOnly = false }: { reviewOnly?: boolean }) {
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Row | null>(null);
   const [detail, setDetail] = useState<{ related: Row[]; collections: Collection[] } | null>(null);
-  const [capabilities, setCapabilities] = useState({ openrouter: false, openai: false });
+  const [capabilities, setCapabilities] = useState({ jev: false, openai: false });
   const [semantic, setSemantic] = useState(false);
 
   const load = useCallback(async () => {
@@ -42,7 +42,7 @@ export function LibraryView({ reviewOnly = false }: { reviewOnly?: boolean }) {
     } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not load bookmarks."); }
     finally { setLoading(false); }
   }, [query, semantic, reviewOnly, filter]);
-  useEffect(() => { const timeout = setTimeout(load, 180); return () => clearTimeout(timeout); }, [load]);
+  useEffect(() => { void load(); }, [load]);
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "k") { event.preventDefault(); document.querySelector<HTMLInputElement>("#library-search")?.focus(); }

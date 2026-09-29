@@ -1,8 +1,8 @@
 import "server-only";
 
 export class MissingKeyError extends Error {
-  constructor(service: "OpenRouter" | "OpenAI") {
-    const variable = service === "OpenRouter" ? "OPENROUTER_API_KEY" : "OPENAI_API_KEY";
+  constructor(service: "Jev" | "OpenAI") {
+    const variable = service === "Jev" ? "JEV_API_KEY" : "OPENAI_API_KEY";
     super(`${service} is not configured. Add ${variable} to .env.local and restart Folio.`);
     this.name = "MissingKeyError";
   }
@@ -19,82 +19,34 @@ export type JevClassification = {
 };
 
 type JsonObject = Record<string, unknown>;
-type DecisionQuestion =
-  | { type: "choice"; instructions: string; criteria: Record<string, string> }
-  | { type: "noul"; instructions: string };
-
-const JEV_MODEL = "typesafe/jev-1.13";
-const OPENROUTER_DECISIONS_URL = "https://openrouter.ai/api/alpha/decisions";
 
 export async function classifyWithJev(
   bookmark: { text: string; author: string; url: string },
   taxonomy: { name: string; description: string }[],
 ): Promise<JevClassification> {
-  const key = process.env.OPENROUTER_API_KEY;
-  if (!key) throw new MissingKeyError("OpenRouter");
-  const endpoint = process.env.OPENROUTER_JEV_ENDPOINT || OPENROUTER_DECISIONS_URL;
+  const key = process.env.JEV_API_KEY;
+  if (!key) throw new MissingKeyError("Jev");
+  const base = (process.env.JEV_BASE_URL || "https://api.typesafe.ai").replace(/\/$/, "");
   const state = `Author: ${bookmark.author}\nURL: ${bookmark.url}\n\n${bookmark.text || "(No text available)"}`;
-  const categories = Object.fromEntries(taxonomy.map((item) => [item.name, item.description]));
-  if (!taxonomy.some((item) => item.name.toLowerCase() === "other")) categories.Other = "None of the other categories apply.";
-  const decisionQuestions = {
-    category: {
-      type: "choice",
-      instructions: "Which category best describes this bookmark?",
-      criteria: categories,
-    },
-    format: {
-      type: "choice",
-      instructions: "What is the bookmark's primary content format?",
-      criteria: {
-        thread: "A multi-post thread.",
-        link: "A link to an article or webpage.",
-        tool: "A product, library, or practical resource.",
-        opinion: "Commentary or a personal viewpoint.",
-        announcement: "News, a launch, or an update.",
-        media: "Image, video, audio, or other media.",
-        other: "None of the other formats apply.",
-      },
-    },
-    priority: {
-      type: "choice",
-      instructions: "How much reading attention does this bookmark deserve?",
-      criteria: {
-        skip: "Not useful enough to revisit.",
-        skim: "Worth a quick scan.",
-        read: "Worth reading carefully.",
-        study: "Worth sustained study or reference.",
-      },
-    },
-    actionable: {
-      type: "noul",
-      instructions: "Does this bookmark contain something concrete the reader can do?",
-    },
-    evergreen: {
-      type: "noul",
-      instructions: "Will this bookmark remain useful over time rather than being time-sensitive?",
-    },
-  } satisfies Record<string, DecisionQuestion>;
-  const systemOne = endpoint.endsWith("/systemone");
-  const questions = systemOne
-    ? Object.entries(decisionQuestions).map(([id, question]) => ({
-        id,
-        type: question.type,
-        ...(question.type === "noul"
-          ? { proposition: question.instructions }
-          : { choices: Object.entries(question.criteria).map(([name, description]) => `${name}: ${description}`) }),
-      }))
-    : decisionQuestions;
-  const response = await fetch(endpoint, {
+  const categories = taxonomy.map((item) => `${item.name}: ${item.description}`);
+  if (!taxonomy.some((item) => item.name.toLowerCase() === "other")) categories.push("Other: none of the above");
+  const response = await fetch(`${base}/v1/systemone`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}`, "X-API-Key": key },
     body: JSON.stringify({
-      model: JEV_MODEL,
+      model: "jev-latest",
       state,
-      questions,
+      questions: [
+        { id: "category", type: "choice", choices: categories },
+        { id: "format", type: "choice", choices: ["thread", "link", "tool", "opinion", "announcement", "media", "other"] },
+        { id: "priority", type: "score", scores: ["skip", "skim", "read", "study"] },
+        { id: "actionable", type: "noul", proposition: "This bookmark contains something concrete the reader can do." },
+        { id: "evergreen", type: "noul", proposition: "This bookmark remains useful over time rather than being time-sensitive." },
+      ],
     }),
     signal: AbortSignal.timeout(30_000),
   });
-  if (!response.ok) throw new Error(`OpenRouter Jev returned ${response.status}: ${(await response.text()).slice(0, 240)}`);
+  if (!response.ok) throw new Error(`Jev returned ${response.status}: ${(await response.text()).slice(0, 240)}`);
   const body = await response.json() as JsonObject;
   const answers = (body.answers ?? body.results ?? body.output ?? body) as JsonObject;
   const answer = (id: string) => (answers[id] ?? {}) as JsonObject;
@@ -104,7 +56,7 @@ export async function classifyWithJev(
   const confidence = Number(categoryAnswer.confidence ?? categoryAnswer.score ?? Math.max(0, ...Object.values(probabilities).map(Number))) || 0;
   const booleanAnswer = (id: string) => {
     const found = answer(id);
-    const raw = found.noul ?? found.value ?? found.answer ?? found.yes ?? false;
+    const raw = found.value ?? found.answer ?? found.yes ?? false;
     return raw === true || raw === "yes" || Number(raw) >= 0.5;
   };
   return {

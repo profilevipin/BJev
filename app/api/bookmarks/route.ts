@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       bookmarks: rows,
       facets,
       capabilities: {
-        openrouter: Boolean(process.env.OPENROUTER_API_KEY),
+        jev: Boolean(process.env.JEV_API_KEY),
         openai: Boolean(process.env.OPENAI_API_KEY),
       },
     });
