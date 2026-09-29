@@ -13,8 +13,16 @@ export function ImportView() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState("");
   const [jobs, setJobs] = useState<Job[]>([]);
+  const [capabilities, setCapabilities] = useState({ openrouter: false, openai: false });
 
-  async function loadJobs() { const response = await fetch("/api/jobs"); if (response.ok) setJobs((await response.json()).jobs); }
+  async function loadJobs() {
+    const response = await fetch("/api/jobs");
+    if (response.ok) {
+      const result = await response.json();
+      setJobs(result.jobs);
+      setCapabilities(result.capabilities);
+    }
+  }
   useEffect(() => { loadJobs(); }, []);
   async function upload() {
     if (!file) return;
@@ -47,8 +55,8 @@ export function ImportView() {
       </Card>
     </div>
     <section className="mt-8"><h2 className="font-editorial text-3xl">Model passes</h2><p className="mt-2 text-sm text-[var(--muted)]">Runs are bounded to 100 bookmarks, four requests at a time, and save after every row. Run again to resume failed or remaining work.</p>
-      <div className="mt-5 grid gap-4 md:grid-cols-2"><Card className="p-5"><h3 className="font-bold">1. Classify with Jev</h3><p className="mt-2 min-h-12 text-sm leading-6 text-[var(--muted)]">Category, format, priority, actionable, and evergreen. Confidence below 55% goes to Review.</p><Button className="mt-4" onClick={() => run("classify")} disabled={Boolean(busy)}><Play size={15} />Classify unclassified</Button></Card>
-      <Card className="p-5"><h3 className="font-bold">2. Enrich with OpenAI</h3><p className="mt-2 min-h-12 text-sm leading-6 text-[var(--muted)]">Add a concise summary, tags, and embeddings for semantic and related search.</p><Button className="mt-4" onClick={() => run("enrich")} disabled={Boolean(busy)}><Play size={15} />Enrich missing</Button></Card></div>
+      <div className="mt-5 grid gap-4 md:grid-cols-2"><Card className="p-5"><div className="flex items-center justify-between gap-3"><h3 className="font-bold">1. Classify with Jev</h3><span className={`text-xs font-semibold ${capabilities.openrouter ? "text-emerald-700" : "text-amber-700"}`}>{capabilities.openrouter ? "OpenRouter ready" : "OpenRouter key missing"}</span></div><p className="mt-2 min-h-12 text-sm leading-6 text-[var(--muted)]">Category, format, priority, actionable, and evergreen via TypeSafe Jev on OpenRouter. Confidence below 55% goes to Review.</p><Button className="mt-4" onClick={() => run("classify")} disabled={Boolean(busy)}><Play size={15} />Classify unclassified</Button></Card>
+      <Card className="p-5"><div className="flex items-center justify-between gap-3"><h3 className="font-bold">2. Enrich with OpenAI</h3><span className={`text-xs font-semibold ${capabilities.openai ? "text-emerald-700" : "text-amber-700"}`}>{capabilities.openai ? "OpenAI ready" : "OpenAI key missing"}</span></div><p className="mt-2 min-h-12 text-sm leading-6 text-[var(--muted)]">Add a concise summary, tags, and embeddings for semantic and related search.</p><Button className="mt-4" onClick={() => run("enrich")} disabled={Boolean(busy)}><Play size={15} />Enrich missing</Button></Card></div>
     </section>
     {error && <p className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</p>}
     {message && <p className="mt-6 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"><CheckCircle2 size={17} />{message}</p>}

@@ -24,7 +24,7 @@ export function LibraryView({ reviewOnly = false }: { reviewOnly?: boolean }) {
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<Row | null>(null);
   const [detail, setDetail] = useState<{ related: Row[]; collections: Collection[] } | null>(null);
-  const [capabilities, setCapabilities] = useState({ jev: false, openai: false });
+  const [capabilities, setCapabilities] = useState({ openrouter: false, openai: false });
   const [semantic, setSemantic] = useState(false);
 
   const load = useCallback(async () => {

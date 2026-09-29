@@ -44,7 +44,14 @@ export async function GET(request: NextRequest) {
       total: (sqlite.prepare("SELECT count(*) count FROM bookmarks").get() as { count: number }).count,
       review: (sqlite.prepare("SELECT count(*) count FROM bookmarks WHERE status='needs_review'").get() as { count: number }).count,
     };
-    return NextResponse.json({ bookmarks: rows, facets, capabilities: { jev: Boolean(process.env.JEV_API_KEY), openai: Boolean(process.env.OPENAI_API_KEY) } });
+    return NextResponse.json({
+      bookmarks: rows,
+      facets,
+      capabilities: {
+        openrouter: Boolean(process.env.OPENROUTER_API_KEY),
+        openai: Boolean(process.env.OPENAI_API_KEY),
+      },
+    });
   } catch (error) {
     const status = error instanceof MissingKeyError ? 400 : 500;
     return NextResponse.json({ error: error instanceof Error ? error.message : "Search failed" }, { status });
