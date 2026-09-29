@@ -25,7 +25,7 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
 }
 
 export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select {...props} className={cn("h-10 rounded-md border bg-white/70 px-3 text-sm outline-none focus:border-[var(--ink)]", props.className)} />;
+  return <select {...props} className={cn("h-10 rounded-md border bg-white/70 px-3 text-sm outline-none focus:border-[var(--ink)]", props.className)}>{React.Children.toArray(props.children)}</select>;
 }
 
 export function Progress({ value }: { value: number }) {

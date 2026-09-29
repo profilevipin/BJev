@@ -95,7 +95,7 @@ export function LibraryView({ reviewOnly = false }: { reviewOnly?: boolean }) {
     <div className="mt-8 grid gap-8 lg:grid-cols-[180px_1fr]">
       <aside className="hidden lg:block"><p className="mb-3 text-[10px] font-bold uppercase tracking-[.2em] text-[var(--muted)]">Filed under</p>
         <button className="flex w-full justify-between py-1.5 text-sm" onClick={() => setFilter({ ...filter, category: "" })}>Everything <span>{categories.reduce((sum, item) => sum + item.count, 0)}</span></button>
-        {categories.filter((item) => item.count).map((item) => <button key={item.id} onClick={() => setFilter({ ...filter, category: item.name })} className="flex w-full justify-between py-1.5 text-left text-sm text-[var(--muted)] hover:text-[var(--ink)]"><span>{item.name}</span><span>{item.count}</span></button>)}
+        <div>{categories.filter((item) => item.count).map((item) => <button key={item.id} onClick={() => setFilter({ ...filter, category: item.name })} className="flex w-full justify-between py-1.5 text-left text-sm text-[var(--muted)] hover:text-[var(--ink)]"><span>{item.name}</span><span>{item.count}</span></button>)}</div>
       </aside>
       <section>
         <div className="mb-3 flex items-center justify-between text-xs text-[var(--muted)]"><span>{loading ? "Looking through your library…" : `${rows.length} bookmark${rows.length === 1 ? "" : "s"}${activeFilters ? " in this view" : ""}`}</span>{activeFilters > 0 && <button onClick={() => setFilter({ category: "", format: "", priority: "", actionable: false })}>Clear filters</button>}</div>
