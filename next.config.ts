@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
     "localhost",
     "*.cursor.sh",
     "*.cursorusercontent.com",
+    "*.trycloudflare.com",
   ],
 };
 
