@@ -80,7 +80,9 @@ const globalForDb = globalThis as unknown as { folioSqlite?: Database.Database }
 
 function openDatabase() {
   const configured = process.env.FOLIO_DB_PATH || "data/folio.db";
-  const filename = path.isAbsolute(configured) ? configured : path.join(process.cwd(), configured);
+  const filename = path.isAbsolute(configured)
+    ? configured
+    : path.join(/* turbopackIgnore: true */ process.cwd(), configured);
   fs.mkdirSync(path.dirname(filename), { recursive: true });
   const sqlite = new Database(filename);
   sqlite.pragma("journal_mode = WAL");
