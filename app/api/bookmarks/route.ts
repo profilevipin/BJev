@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
       facets,
       capabilities: {
         jev: hasOpenRouter(),
+        openrouter: hasOpenRouter(),
         openai: Boolean(process.env.OPENAI_API_KEY),
       },
     });

@@ -135,7 +135,8 @@ function openDatabase() {
   const count = (sqlite.prepare("SELECT count(*) AS count FROM bookmarks").get() as { count: number }).count;
   if (count === 0) {
     const now = new Date().toISOString();
-    const insert = sqlite.prepare(`INSERT INTO bookmarks
+    // OR IGNORE: next build workers can import this module in parallel.
+    const insert = sqlite.prepare(`INSERT OR IGNORE INTO bookmarks
       (tweet_id,url,text,author,summary,tags_json,category_id,format,priority,actionable,evergreen,confidence,status,is_sample,raw_json,media_json,created_at,updated_at)
       VALUES (@tweetId,@url,@text,@author,@summary,@tags,(SELECT id FROM categories WHERE name=@category),@format,@priority,@actionable,@evergreen,.92,'classified',1,'{}','[]',@now,@now)`);
     const transaction = sqlite.transaction(() => sampleBookmarks.forEach((item) => insert.run({ ...item, tags: JSON.stringify(item.tags), now })));
@@ -145,5 +146,5 @@ function openDatabase() {
 }
 
 export const sqlite = globalForDb.folioSqlite ?? openDatabase();
-if (process.env.NODE_ENV !== "production") globalForDb.folioSqlite = sqlite;
+globalForDb.folioSqlite = sqlite;
 export const db = drizzle(sqlite, { schema });

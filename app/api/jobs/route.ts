@@ -12,6 +12,7 @@ export async function GET() {
     jobs: sqlite.prepare("SELECT * FROM jobs ORDER BY created_at DESC LIMIT 20").all(),
     capabilities: {
       jev: hasOpenRouter(),
+      openrouter: hasOpenRouter(),
       openai: Boolean(process.env.OPENAI_API_KEY),
     },
   });
