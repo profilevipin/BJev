@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cosine, embedQuery, MissingKeyError } from "@/lib/ai";
+import { cosine, embedQuery, hasOpenRouter, MissingKeyError } from "@/lib/ai";
 import { sqlite } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       bookmarks: rows,
       facets,
       capabilities: {
-        jev: Boolean(process.env.JEV_API_KEY),
+        jev: hasOpenRouter(),
         openai: Boolean(process.env.OPENAI_API_KEY),
       },
     });

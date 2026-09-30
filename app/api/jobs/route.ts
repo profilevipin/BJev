@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { classifyWithJev, enrichWithOpenAI, MissingKeyError } from "@/lib/ai";
+import { classifyWithJev, enrichWithOpenAI, hasOpenRouter, MissingKeyError } from "@/lib/ai";
 import { sqlite } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -11,7 +11,7 @@ export async function GET() {
   return NextResponse.json({
     jobs: sqlite.prepare("SELECT * FROM jobs ORDER BY created_at DESC LIMIT 20").all(),
     capabilities: {
-      jev: Boolean(process.env.JEV_API_KEY),
+      jev: hasOpenRouter(),
       openai: Boolean(process.env.OPENAI_API_KEY),
     },
   });
@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({})) as { type?: "classify" | "enrich"; force?: boolean; limit?: number };
   const type = body.type || "classify";
-  if (type === "classify" && !process.env.JEV_API_KEY) return NextResponse.json({ error: new MissingKeyError("Jev").message }, { status: 400 });
+  if (type === "classify" && !hasOpenRouter()) return NextResponse.json({ error: new MissingKeyError("OpenRouter").message }, { status: 400 });
   if (type === "enrich" && !process.env.OPENAI_API_KEY) return NextResponse.json({ error: new MissingKeyError("OpenAI").message }, { status: 400 });
   const limit = Math.min(Math.max(body.limit || 100, 1), 500);
   const condition = type === "classify"

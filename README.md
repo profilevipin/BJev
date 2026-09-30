@@ -28,8 +28,8 @@ All model credentials are server-only. Never expose them with a `NEXT_PUBLIC_` p
 
 | Variable | Purpose | Default |
 | --- | --- | --- |
-| `JEV_API_KEY` | Jev classification | unset |
-| `JEV_BASE_URL` | Jev API origin | `https://api.typesafe.ai` |
+| `OPENROUTER_API_KEY` | Jev classification via OpenRouter | unset |
+| `OpenRouter` | Alternate secret name (Cursor dashboard) | unset |
 | `OPENAI_API_KEY` | summaries, tags, taxonomy, embeddings | unset |
 | `OPENAI_MODEL` | text generation model | `gpt-4.1-mini` |
 | `OPENAI_EMBEDDING_MODEL` | embedding model | `text-embedding-3-small` |
@@ -37,7 +37,7 @@ All model credentials are server-only. Never expose them with a `NEXT_PUBLIC_` p
 
 Missing keys are shown as actionable messages in the UI. Import, keyword search, filters, collections, manual categories, and review remain local and usable.
 
-Classification calls `POST /v1/systemone` on `JEV_BASE_URL` with the `jev-latest` model. OpenAI remains a separate provider for generative summaries, tags, taxonomy suggestions, and embeddings.
+Classification calls Jev through OpenRouter (`POST https://openrouter.ai/api/v1/systemone`, model `jev-latest`). OpenAI remains a separate provider for generative summaries, tags, taxonomy suggestions, and embeddings.
 
 ## Import bookmarks
 
