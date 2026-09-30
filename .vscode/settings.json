@@ -1,0 +1,12 @@
+{
+  "remote.autoForwardPorts": true,
+  "remote.autoForwardPortsSource": "hybrid",
+  "remote.portsAttributes": {
+    "43123": {
+      "label": "Folio",
+      "onAutoForward": "openPreview",
+      "protocol": "http",
+      "requireLocalPort": true
+    }
+  }
+}

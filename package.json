@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --webpack --hostname 0.0.0.0 --port 43123",
     "build": "next build",
-    "start": "next start --hostname 0.0.0.0 --port 43123",
+    "start": "bash scripts/serve.sh",
+    "start:next": "next start --hostname 0.0.0.0 --port 43123",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "db:seed": "tsx scripts/seed.ts"

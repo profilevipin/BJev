@@ -1,7 +1,13 @@
 {
   "name": "Folio",
-  "install": "npm install",
-  "start": "npm run start",
+  "install": "npm install\nnpm run build",
+  "start": "bash scripts/serve.sh",
+  "terminals": [
+    {
+      "name": "folio",
+      "command": "bash scripts/serve.sh"
+    }
+  ],
   "ports": [
     {
       "name": "Folio",
